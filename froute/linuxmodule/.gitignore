@@ -5,3 +5,7 @@
 *.order
 *.ko
 .tmp_versions/
+.bash_history
+mount.host
+*.sublime-project
+*.sublime-workspace
