@@ -11,11 +11,11 @@
 #include <linux/jiffies.h>
 
 #define NETLINK_MAX_BUDGET (0.1 * HZ)
-#define ROUTER_MAX_BUDGET (0.7 * HZ)
-#define OS_MAX_BUDGET (0.2 * HZ)
+#define ROUTER_MAX_BUDGET (0.5 * HZ)
+#define OS_MAX_BUDGET (0.5 * HZ)
 
 struct router_sched {
-	
+
 	/* Netlink CPU Cycles */
 	unsigned long netlink_budget;// = NETLINK_MAX_BUDGET;
 
@@ -55,8 +55,8 @@ inline static int sched_nl(struct  router_sched *rt_struct)
  */
 inline static int sched_packet(struct  router_sched *rt_struct)
 {
-	if (rt_struct->router_budget > 0)
-	{
+	//printk(KERN_ALERT "sched_packet RT_BUDGET: %lu\n", rt_struct->router_budget);
+	if (rt_struct->router_budget > 0) {
 		return (0);
 	} else	{
 		return (1);
@@ -73,8 +73,8 @@ inline static int sched_packet(struct  router_sched *rt_struct)
  */
 inline static int sched_os(struct  router_sched *rt_struct)
 {
-	if (rt_struct->os_budget > 0)
-	{
+	//printk(KERN_ALERT "sched_packet OS_BUDGET: %lu\n", rt_struct->os_budget);
+	if (rt_struct->os_budget > 0) {
 		return (0);
 	} else	{
 		return (1);
@@ -98,7 +98,12 @@ inline static void sched_nl_update_work(struct  router_sched *rt_struct, unsigne
  */
 inline static void sched_packet_update_work(struct  router_sched *rt_struct, unsigned long work_done)
 {
-	rt_struct->router_budget -= work_done;
+	//printk(KERN_ALERT "RT_UPDATE_BUDGET: Work/Total => %lu/%lu\n", work_done, rt_struct->router_budget);
+	if (work_done <= rt_struct->router_budget) {
+		rt_struct->router_budget -= work_done;
+	} else {
+		rt_struct->router_budget = 0;
+	}
 };
 
 /*
@@ -108,7 +113,12 @@ inline static void sched_packet_update_work(struct  router_sched *rt_struct, uns
  */
 inline static void sched_os_update_work(struct  router_sched *rt_struct, unsigned long work_done)
 {
-	rt_struct->os_budget -= work_done;
+	//printk(KERN_ALERT "OS_UPDATE_BUDGET: Work/Total => %lu/%lu\n", work_done, rt_struct->os_budget);
+	if (work_done <= rt_struct->os_budget) {
+		rt_struct->os_budget -= work_done;
+	} else {
+		rt_struct->os_budget = 0;
+	}
 };
 
 /*
@@ -118,6 +128,7 @@ inline static void sched_os_update_work(struct  router_sched *rt_struct, unsigne
  */
 inline static void sched_reset_budget(struct  router_sched *rt_struct)
 {
+	printk(KERN_ALERT "Resetting Budget at HZ:%d\n", HZ);
 	rt_struct->netlink_budget = NETLINK_MAX_BUDGET;
 	rt_struct->router_budget = ROUTER_MAX_BUDGET;
 	rt_struct->os_budget = OS_MAX_BUDGET;

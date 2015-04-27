@@ -28,9 +28,9 @@ struct fib_rtable {
 };
 
 struct fib_route {
-	unsigned int ip;
-	unsigned int mask;
-	unsigned int nh;
+	u32 ip;
+	u32 mask;
+	u32 nh;
 	unsigned int metric;
 	struct net_device *dev;	/* Beware */
 	enum rt_type type;	/* type of route */

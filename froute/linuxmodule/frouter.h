@@ -24,7 +24,7 @@ struct fr_nl_data
 	struct sk_buff *q;
 };
 
-#define FR_TX_Q_SIZE 1024
+#define FR_TX_Q_SIZE 64
 
 /*
  * struct fr_tx_q
@@ -39,10 +39,17 @@ struct FR_TX_Q
 	unsigned int out;
 };
 
+struct fib_rtable;
 /*
  * Main Routing Table
  */
 extern struct fib_rtable *main_rt_table;
+
+struct arp_entry_s;
+/*
+ * Main ARPTable
+ */
+extern struct arp_entry_s *arp_tbl;
 
 /*
  * init_sched	-	start and schedule threads

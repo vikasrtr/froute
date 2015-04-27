@@ -1,6 +1,7 @@
 *.o
 tags
 TAGS
+cscope.out
 .cproject
 .project
 /.settings
