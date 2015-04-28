@@ -27,6 +27,8 @@
 
 #include <linux/slab.h>
 #include <linux/string.h>
+#include <net/ip_fib.h>
+#include <net/flow.h>
 
 #include "route.h"
 #include "frouter.h"
@@ -46,24 +48,56 @@ inline int processRoutes(struct fib_route *res, struct fib_route *first) {
 	return (0);
 }
 
-int fib_rtable_lookup(struct fib_rtable *rtable, struct fib_route *rt, unsigned int ip) {
+int fib_rtable_lookup(struct sk_buff *skb, struct fib_route *fib_res, __be32 daddr, __be32 saddr, u8 tos) {
 	//loop until a match
-	struct rl_head *rlist = rtable->next;
-	if (!rlist)
+	struct fib_result res;
+	struct flowi4 fl4;
+	int		err = -EINVAL;
+	struct net    *net = dev_net(skb->dev);
+	struct fib_nh *nh;
+
+	/*
+	 *	Now we are ready to route packet.
+	 */
+	fl4.flowi4_oif = 0;
+	fl4.flowi4_iif = skb->dev->ifindex;
+	fl4.flowi4_mark = skb->mark;
+	fl4.flowi4_tos = tos;
+	fl4.flowi4_scope = RT_SCOPE_UNIVERSE;
+	fl4.daddr = daddr;
+	fl4.saddr = saddr;
+	err = fib_lookup(net, &fl4, &res);
+	if (err != 0) {
+		return (-1);
+	}
+	if (res.type == RTN_LOCAL)
 	{
-		rt = 0;
-		return (0);
+		fib_res->type = RT_LOCAL;
+	} else {
+		fib_res->type = RT_OTHER;
 	}
-	while (rlist) {
-		if ((rlist->data->ip & rlist->data->mask) == (ip & rlist->data->mask))
+	fib_res->dev = FIB_RES_DEV(res);
+	nh = &FIB_RES_NH(res);
+	fib_res->ip = nh->nh_gw;
+
+	return (0);
+
+	/*	struct rl_head *rlist = rtable->next;
+		if (!rlist)
 		{
-			//a match
-			return processRoutes(rt, rlist->data);
+			rt = 0;
+			return (0);
 		}
-		rlist = rlist->next;
-	}
-	rt = 0;
-	return (-1);
+		while (rlist) {
+			if ((rlist->data->ip & rlist->data->mask) == (ip & rlist->data->mask))
+			{
+				//a match
+				return processRoutes(rt, rlist->data);
+			}
+			rlist = rlist->next;
+		}
+		rt = 0;
+		return (-1);*/
 }
 
 int fib_rtable_insert(struct fib_rtable *rtable, struct fib_route *new_rt) {

@@ -14,9 +14,9 @@
  * route types
  */
 enum rt_type {
- 	RT_LOCAL,	/* deliver locally */
- 	RT_OTHER	/* forward to other host */
- };
+	RT_LOCAL,	/* deliver locally */
+	RT_OTHER	/* forward to other host */
+};
 
 struct rl_head {
 	struct rl_head *next;
@@ -39,7 +39,7 @@ struct fib_route {
 
 // protos
 extern void init_rtable(struct fib_rtable *rt_table);
-extern int fib_rtable_lookup(struct fib_rtable *rtable, struct fib_route *rt, unsigned int ip);
+extern int fib_rtable_lookup(struct sk_buff *skb, struct fib_route *fib_res, __be32 daddr, __be32 saddr, u8 tos);
 extern int fib_rtable_insert(struct fib_rtable *rtable, struct fib_route *new_rt);
 extern int fib_rtable_delete(struct fib_rtable *rtable, struct fib_route *rt);
 extern int fib_rtable_freetable(struct fib_rtable *rtable);

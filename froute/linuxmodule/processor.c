@@ -68,12 +68,12 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
 			goto inhdr_error;
 
-/*		//skb playground
-		printk(KERN_ALERT "head: %p\n", skb->head);
-		printk(KERN_ALERT "data: %p\n", skb->data);
-		printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
-		printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
-		printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
+		/*		//skb playground
+				printk(KERN_ALERT "head: %p\n", skb->head);
+				printk(KERN_ALERT "data: %p\n", skb->data);
+				printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
+				printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
+				printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
 
 
 		iph = ip_hdr(skb);
@@ -97,14 +97,7 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 
 		/* check for route */
 		//printk(KERN_ALERT "ROUTE lookup:");
-		//err = fib_rtable_lookup(main_rt_table, &fib_res, (unsigned long)iph->daddr);
-
-		fib_res.ip = 3232235781;
-		fib_res.mask = 0xffffff00;
-		fib_res.nh = 3232235781;
-		fib_res.dev = skb->dev;
-		fib_res.type = RT_OTHER;
-		err = 0;
+		err = fib_rtable_lookup(skb, &fib_res, iph->daddr, iph->saddr, iph->tos);
 
 		if (err != 0)
 			goto routing_error;
@@ -195,7 +188,7 @@ inhdr_error:
 		goto drop;
 
 routing_error:
-		printk(KERN_ALERT "#fr: Routing Error\n");
+		printk(KERN_ALERT "#fr: No Route Error\n");
 		goto drop;
 
 		/*arp_fail:
@@ -233,18 +226,18 @@ int process_tx(int __burst, struct FR_TX_Q *fr_tx_q) {
 
 		/* deque a skb */
 		fr_q_get(fr_tx_q, skb, FR_TX_Q_SIZE);
-		
+
 		//skb playground
-/*		printk(KERN_ALERT "head: %p\n", skb->head);
-		printk(KERN_ALERT "data: %p\n", skb->data);
-		printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
-		printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
-		printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
+		/*		printk(KERN_ALERT "head: %p\n", skb->head);
+				printk(KERN_ALERT "data: %p\n", skb->data);
+				printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
+				printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
+				printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
 
 		//printk(KERN_ALERT "Trying to xmit()\n");
 		//skb->data = skb->data - 14;
-		skb_push(skb, sizeof(struct eth_hdr));
-		skb_reset_mac_header();
+		skb_push(skb, sizeof(struct ethhdr));
+		skb_reset_mac_header(skb);
 		res = dev_queue_xmit(skb);
 		printk(KERN_ALERT "xmitted() with res: %d\n", res);
 
