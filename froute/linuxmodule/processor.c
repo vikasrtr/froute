@@ -43,7 +43,7 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 	struct iphdr *iph;
 	struct FR_RX_Q *rx_q = &__get_cpu_var(fr_rx_q);
 
-	printk(KERN_ALERT "==>\n");
+	//printk(KERN_ALERT "==>\n");
 
 	do {
 		if (fr_q_is_empty(rx_q)) {
@@ -51,7 +51,7 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 			return (__pkt_processed);
 		}
 
-		printk(KERN_ALERT "\nPacket Info\n");
+		//printk(KERN_ALERT "\nPacket Info\n");
 
 
 		/* get a packet */
@@ -69,11 +69,11 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 			goto inhdr_error;
 
 		/*		//skb playground
-				printk(KERN_ALERT "head: %p\n", skb->head);
-				printk(KERN_ALERT "data: %p\n", skb->data);
-				printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
-				printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
-				printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
+				//printk(KERN_ALERT "head: %p\n", skb->head);
+				//printk(KERN_ALERT "data: %p\n", skb->data);
+				//printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
+				//printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
+				//printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
 
 
 		iph = ip_hdr(skb);
@@ -90,15 +90,16 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 
 		/* check if packet is for current system */
 
-		//printk(KERN_ALERT "reached LOOKUP.");
-		/*printk(KERN_ALERT "Packet Src_IP: %lu\tOUT\n", (unsigned long)ntohl(ip_hdr(skb)->saddr));
-		printk(KERN_ALERT "Packet Dest_IP: %lu\tOUT\n", (unsigned long)ntohl(ip_hdr(skb)->daddr));
+		////printk(KERN_ALERT "reached LOOKUP.");
+		/*//printk(KERN_ALERT "Packet Src_IP: %lu\tOUT\n", (unsigned long)ntohl(ip_hdr(skb)->saddr));
+		//printk(KERN_ALERT "Packet Dest_IP: %lu\tOUT\n", (unsigned long)ntohl(ip_hdr(skb)->daddr));
 		*////goto drop;
 
 		/* check for route */
-		//printk(KERN_ALERT "ROUTE lookup:");
+		////printk(KERN_ALERT "ROUTE lookup:");
 		err = fib_rtable_lookup(skb, &fib_res, iph->daddr, iph->saddr, iph->tos);
 
+		//printk(KERN_ALERT "RT_Look info: nh_gw: %s\n", fib_res.dev->dev_addr);
 		if (err != 0)
 			goto routing_error;
 
@@ -129,9 +130,9 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 			/* Update output device */
 			skb->dev = __dev_get_by_name(&init_net, "eth1");
 
-			//printk(KERN_ALERT "reached arp_lookup..");
+			////printk(KERN_ALERT "reached arp_lookup..");
 			/*			char *a = skb->dev->dev_addr;
-						printk(KERN_ALERT "dev_addr of eth1: %02x:%02x:%02x:%02x:%02x:%02x\n", a[0],a[1],a[2],a[3],a[4],a[5]);
+						//printk(KERN_ALERT "dev_addr of eth1: %02x:%02x:%02x:%02x:%02x:%02x\n", a[0],a[1],a[2],a[3],a[4],a[5]);
 						goto out;
 			*/
 			/* Update neighbour info */
@@ -147,29 +148,30 @@ int process_packets(int _no_of_pkts, struct FR_TX_Q *fr_tx_q) {
 			/*if (memcmp(eth->h_source, skb->dev->dev_addr, ETH_ALEN)){
 				goto redirect_error;
 			}*/
-			char arp[ETH_ALEN] = {0x1e, 0x3e, 0x5b, 0xdb, 0xc6, 0x8c};
+			char arp[ETH_ALEN] = {0x78, 0x84, 0x3c, 0xee, 0x6e, 0x08};
+			//char arp[ETH_ALEN] = {0x12, 0x43, 0x84, 0x61, 0xf0, 0x91};
 
 			char *a = skb->dev->dev_addr;
-			printk(KERN_ALERT "eth_H_source: %02x: %02x: %02x: %02x: %02x: %02x\n", a[0], a[1], a[2], a[3], a[4], a[5]);
-			//printk(KERN_ALERT "eth_H_source: %d: %d: %d: %d: %d: %d\n", a[0], a[1], a[2], a[3], a[4], a[5]);
+			//printk(KERN_ALERT "eth_H_source: %02x: %02x: %02x: %02x: %02x: %02x\n", a[0], a[1], a[2], a[3], a[4], a[5]);
+			////printk(KERN_ALERT "eth_H_source: %d: %d: %d: %d: %d: %d\n", a[0], a[1], a[2], a[3], a[4], a[5]);
 
-			/*			printk(KERN_ALERT "Eth Header:[");
+			/*			//printk(KERN_ALERT "Eth Header:[");
 						int i;
 						for (i = 0; i < 14; ++i)
 						{
-							printk(KERN_ALERT "%0x", eth[i+2]);
+							//printk(KERN_ALERT "%0x", eth[i+2]);
 						}
-						printk(KERN_ALERT "]<===");*/
+						//printk(KERN_ALERT "]<===");*/
 			/* Update h_source and h_dest */
 			memcpy(eth->h_source, skb->dev->dev_addr, ETH_ALEN);
 			memcpy(eth->h_dest, arp, ETH_ALEN);
 			skb->protocol = eth->h_proto = htons(ETH_P_IP);
 
 			//a = eth->h_dest;
-			//printk(KERN_ALERT "eth_H_dest: %02x: %02x: %02x: %02x: %02x: %02x\n", a[0], a[1], a[2], a[3], a[4], a[5]);
+			////printk(KERN_ALERT "eth_H_dest: %02x: %02x: %02x: %02x: %02x: %02x\n", a[0], a[1], a[2], a[3], a[4], a[5]);
 
 			/* add to tx queue */
-			//printk(KERN_ALERT "Trying to add to tx_q");
+			////printk(KERN_ALERT "Trying to add to tx_q");
 			fr_q_put(fr_tx_q, skb, FR_TX_Q_SIZE);
 			printk(KERN_ALERT "Added to tx_q\n");
 		}
@@ -192,7 +194,7 @@ routing_error:
 		goto drop;
 
 		/*arp_fail:
-				printk(KERN_ALERT "#fr: ARP Enntry not found\n");
+				//printk(KERN_ALERT "#fr: ARP Enntry not found\n");
 		*/
 drop:
 		kfree_skb(skb);
@@ -228,13 +230,13 @@ int process_tx(int __burst, struct FR_TX_Q *fr_tx_q) {
 		fr_q_get(fr_tx_q, skb, FR_TX_Q_SIZE);
 
 		//skb playground
-		/*		printk(KERN_ALERT "head: %p\n", skb->head);
-				printk(KERN_ALERT "data: %p\n", skb->data);
-				printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
-				printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
-				printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
+		/*		//printk(KERN_ALERT "head: %p\n", skb->head);
+				//printk(KERN_ALERT "data: %p\n", skb->data);
+				//printk(KERN_ALERT "data - head: %d\n", skb->data - skb->head);
+				//printk(KERN_ALERT "mac_hdr: %d\n", skb->mac_header);
+				//printk(KERN_ALERT "net_hdr: %d\n", skb->network_header);*/
 
-		//printk(KERN_ALERT "Trying to xmit()\n");
+		////printk(KERN_ALERT "Trying to xmit()\n");
 		//skb->data = skb->data - 14;
 		skb_push(skb, sizeof(struct ethhdr));
 		skb_reset_mac_header(skb);

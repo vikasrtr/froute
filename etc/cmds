@@ -1,0 +1,13 @@
+tap0: 192.168.0.254
+tap1: 192.168.1.254
+
+uml_switch -tap tap0 -unix /tmp/umlswitch0
+uml_switch -tap tap1 -unix /tmp/umlswitch1
+
+./linux ubda=Debian-Wheezy-AMD64-root_fs mem=128M eth0=daemon,192.168.0.4,,/tmp/umlswitch0 eth1=daemon,192.168.1.4,,/tmp/umlswitch1
+
+
+./linux ubda=Debian-Wheezy-AMD64-root_fs mem=128M eth0=daemon,192.168.1.5,,/tmp/umlswitch1
+
+
+

@@ -89,6 +89,8 @@ static void __exit frouter_shutdown(void) {
 */
 	fr_trap_disable();
 
+	//Kill all threads here
+
 	printk(KERN_ALERT "#fr: Leaving module!\n");
 }
 

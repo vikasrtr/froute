@@ -18,7 +18,7 @@
  */
 int fr_sched(void *data)
 {
-	int DEBUG_P = 10, DEBUG_O = 10, DEBUG_MAIN = 1;
+	int DEBUG_P = 10, DEBUG_O = 10, DEBUG_MAIN = 3;
 
 	int _tx_burst, _no_of_pkts = 0;
 	unsigned long _init_jiffies, _final_jiffies, work_done;
@@ -62,11 +62,11 @@ int fr_sched(void *data)
 		do {
 			work_done = 0;
 
-			if (!DEBUG_P--) {
+/*			if (!DEBUG_P--) {
 				printk(KERN_ALERT "\nPPx BREAK DEBUG!\n\n\n");
 				break;
 			}
-
+*/
 			/* scheduling */
 			if (sched_packet(&rt_sched)) {
 				printk(KERN_ALERT "\nPPx Budget OVER....!\n\n\n");
@@ -107,10 +107,10 @@ int fr_sched(void *data)
 		while (1) {
 			work_done = 0;
 
-			if (!DEBUG_O--) {
+/*			if (!DEBUG_O--) {
 				printk(KERN_ALERT "\nOS BREAK DEBUG!\n\n\n");
 				break;
-			}
+			}*/
 
 			/* scheduling */
 			if (sched_os(&rt_sched)) {
@@ -120,7 +120,7 @@ int fr_sched(void *data)
 			_init_jiffies = jiffies;
 
 			// run the OS
-			printk(KERN_ALERT "OS: is sleeping...\n");
+			printk(KERN_ALERT "\nScheduling OS Again\n\n");
 			set_current_state(TASK_INTERRUPTIBLE);
 			schedule_timeout(rt_sched.os_budget);
 
@@ -148,7 +148,7 @@ void init_sched(void)
 		printk(KERN_INFO "entering func: %s\n", __FUNCTION__);
 	}
 
-	//printk(KERN_INFO "starting worker threads...\n");
+	printk(KERN_INFO "starting worker threads...\n");
 
 	cpus = num_online_cpus();
 	for (i = 0; i < cpus; ++i) {

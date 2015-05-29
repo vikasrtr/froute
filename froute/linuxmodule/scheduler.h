@@ -12,7 +12,7 @@
 
 #define NETLINK_MAX_BUDGET (0.1 * HZ)
 #define ROUTER_MAX_BUDGET (0.5 * HZ)
-#define OS_MAX_BUDGET (0.5 * HZ)
+#define OS_MAX_BUDGET (1 * HZ)
 
 struct router_sched {
 
