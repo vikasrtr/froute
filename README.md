@@ -4,7 +4,9 @@
 ### A Software based IP Router
 
 Froute is a experimental x86-based software IP Router
-Froute ustilises a linux kernel module to implement FIB, and user-space daemons for working with RIB and Routing Protocols
+Froute ustilises a linux kernel module to implement FIB, and user-space daemons for working with RIB and Routing Protocols.
+
+**NOTE**: Supports Linux Kernel 3.12 only
 
 ### Structure
 
